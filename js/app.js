@@ -1,6 +1,5 @@
 //  Data de restaurantes
-var restaurants = {   
-    'establishments' : [
+var restaurants = [
     {
 		"name": "Goethe-Institut Mexiko",
 		"img": "../assets/img/GIMexiko.jpg",
@@ -67,20 +66,29 @@ var restaurants = {
 		    lat: 19.41986
 		}
 	}
-    ]
-};
+];
+
+
 
 function loadPage() {
-    setInterval(function(){
+	splash();
+	showRestaurants(restaurants);
+	$('#search').keyup(filterRestaurants);
+	$('.modal').modal();
+}
+
+function splash() {
+	setInterval(function(){
         //location.replace("views/view-2.html");
         $('#splash').hide();
         $('#principal').removeAttr('class');
-      }, 5000);
+	  }, 3000);
 }
 
 // Pinta en el HTML la plantilla con la info de los restaurantes
 var showRestaurants = function (array) {
 	// Plantilla para hacer la tarjeta de restaurantes en el html
+		
 		var template = '<article class="item-restaurante">' +
 		      '<div class="col s12 m12">' +
 		          '<div class="card horizontal">' +
@@ -102,7 +110,11 @@ var showRestaurants = function (array) {
 		   '</article>';
 
 		var finalTemplate = "";
-		array.forEach(function (restaurant) {
+		array.forEach(function(restaurant) {
+			var $containerName = $('<h5 />');
+			$containerName.attr('data-name', restaurant.name);
+			$containerName.text(restaurants.name);
+			
 			finalTemplate += template.replace("__src__", restaurant.img)
 								  .replace("__name__", restaurant.name)
 		                          .replace("__category__", restaurant.category)
@@ -121,13 +133,34 @@ var showRestaurants = function (array) {
 
 // Hace el filtro por restaurantes (lo devuleve en arreglo)
 var filterRestaurants = function () {
-	
+	if ($('#search').val().trim().length > 0) {
+		var searchRestaurants = $('#search').val().toLowerCase();
+		var filteredRestaurants = restaurants.filter(function(rest) {
+			return rest.name.toLowerCase().indexOf(searchRestaurants) >= 0;
+		});
+		showRestaurants(filteredRestaurants);
+	} else {
+		$('#restaurants-list').empty();
+		showRestaurants(restaurants);
+	}
+
 };
+
+
+
 
 // Pintar modal con detalles de cada restaurant
 var paintModal = function() {
+	var name = $(this).data('name');
+	var price = $(this).data('price');
+	var category = $(this).data('category');
+	var address = $(this).data('address');
 
+	$('#name').text(name);
+	$('#price').text(price);
+	$('#category').text(category);
+	$('#address').text(address);
 }
 
-
+$(document).on('click', '.modales', paintModal);
 $(document).ready(loadPage);
